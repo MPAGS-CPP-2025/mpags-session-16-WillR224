@@ -16,7 +16,7 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
     bool processStatus{true};
 
     // Default to expecting information about one cipher
-    const std::size_t nExpectedCiphers{1};
+    std::size_t nExpectedCiphers{1};
     settings.cipherType.reserve(nExpectedCiphers);
     settings.cipherKey.reserve(nExpectedCiphers);
 
@@ -103,7 +103,23 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
                 }
                 ++i;
             }
-        } else {
+        } else if (cmdLineArgs[i] == "--multi-cipher") {
+            if (i == nCmdLineArgs - 1) {
+                std::cerr << "[error] --multi-cipher requires a positive integer argument"
+                          << std::endl;
+                // Set the flag to indicate the error and terminate the loop
+                processStatus = false;
+                break;
+            }
+            else{
+                nExpectedCiphers = std::stoi(cmdLineArgs[i+1]);
+                settings.cipherType.reserve(nExpectedCiphers);
+                settings.cipherKey.reserve(nExpectedCiphers);
+                ++i;
+            }
+
+        }
+        else {
             // Have encoutered an unknown flag, output an error message,
             // set the flag to indicate the error and terminate the loop
             std::cerr << "[error] unknown argument '" << cmdLineArgs[i]
